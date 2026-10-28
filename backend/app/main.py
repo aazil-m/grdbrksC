@@ -119,5 +119,9 @@ app = FastAPI(
     title="UK Wind Forecast Monitor",
     description="Day-ahead wind forecast vs actual generation (Elexon BMRS), January 2026.",
     version="0.1.0",
+    # Served under /api so the docs are reachable behind the same routing as the API.
+    docs_url="/api/docs",
+    redoc_url=None,
+    openapi_url="/api/openapi.json",
 )
 app.include_router(router)

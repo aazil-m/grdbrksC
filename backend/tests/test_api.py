@@ -20,6 +20,11 @@ def test_health() -> None:
     assert get("/api/health") == {"status": "ok", "firstDay": "2026-01-02", "lastDay": "2026-02-01"}
 
 
+def test_interactive_docs_are_served_under_api() -> None:
+    assert client.get("/api/docs").status_code == 200
+    assert client.get("/api/openapi.json").json()["info"]["title"] == "UK Wind Forecast Monitor"
+
+
 def test_day_returns_hourly_decision_points_and_half_hourly_actuals() -> None:
     body = get("/api/day", date="2026-01-15", cutoff="09:00")
     assert body["cutoffUtc"] == "2026-01-14T09:00:00Z"
