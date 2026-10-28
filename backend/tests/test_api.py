@@ -53,6 +53,8 @@ def test_metrics_cover_all_delivery_days() -> None:
     assert len(body["byDay"]) == 31 and len(body["byHourOfDay"]) == 24
     assert sum(b["count"] for b in body["histogram"]) == body["summary"]["count"]
     assert body["byHorizon"][0]["lowerHours"] == 0
+    # 09:00 cutoff -> the 07:30 run on D-1: 16.5 h to 00:00 and 39.5 h to 23:00 on D.
+    assert (body["decisionHorizonMin"], body["decisionHorizonMax"]) == (16.5, 39.5)
 
 
 @pytest.mark.parametrize(

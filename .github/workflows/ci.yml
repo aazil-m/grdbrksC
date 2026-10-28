@@ -40,3 +40,18 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
       - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose build
+      - run: docker compose up -d --wait
+      - name: Smoke test through nginx
+        run: |
+          curl -fsS --retry 10 --retry-delay 2 --retry-all-errors http://localhost:8080/api/health
+          curl -fsS "http://localhost:8080/api/metrics?cutoff=09:20" > /dev/null
+          curl -fsS http://localhost:8080/ | grep -q "UK Wind Forecast Monitor"
+      - if: always()
+        run: docker compose down
