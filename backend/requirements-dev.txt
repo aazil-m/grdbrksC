@@ -1,0 +1,6 @@
+-r requirements.txt
+# httpx is also used by the offline ingest package (python -m ingest)
+httpx==0.28.1
+mypy==2.4.0
+pytest==9.2.0
+ruff==0.17.3
