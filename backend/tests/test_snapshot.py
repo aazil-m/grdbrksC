@@ -2,9 +2,11 @@
 
 import json
 from collections import defaultdict
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, time, timedelta
 from typing import Any
 
+from app.metrics import evaluate
+from app.snapshot import load_snapshot
 from ingest.snapshot import DATA_DIR, DELIVERY_END, DELIVERY_START
 
 FMT = "%Y-%m-%dT%H:%M:%SZ"
@@ -42,3 +44,11 @@ def test_every_day_ahead_run_covers_the_whole_delivery_day() -> None:
         assert day_ahead_runs, f"no forecast runs published on {previous_day}"
         for publish_time in day_ahead_runs:
             assert hours <= runs[publish_time], f"run {publish_time} misses hours of {day:%Y-%m-%d}"
+
+
+def test_real_data_missing_hours_depend_on_cutoff() -> None:
+    snapshot = load_snapshot()
+    # Before the first run of D-1 (02:30), the latest run is D-2 22:30, which
+    # only reaches 21:00 on D: hours 22 and 23 are missing on each of the 31 days.
+    assert evaluate(snapshot, time(2, 29)).missing_hours == 2 * 31
+    assert evaluate(snapshot, time(2, 30)).missing_hours == 0
