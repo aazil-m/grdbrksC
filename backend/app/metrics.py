@@ -20,7 +20,7 @@ class Summary:
     mae: float
     rmse: float
     bias: float
-    nmae_pct: float
+    nmae_pct: float | None
     """MAE as a percentage of the mean actual generation over the same points."""
     p10: float
     p50: float
@@ -97,7 +97,7 @@ def summarize(points: list[HourPoint]) -> Summary | None:
         mae=_mae(errors),
         rmse=_rmse(errors),
         bias=_bias(errors),
-        nmae_pct=100 * _mae(errors) / mean_actual if mean_actual else math.nan,
+        nmae_pct=100 * _mae(errors) / mean_actual if mean_actual else None,
         p10=deciles[0],
         p50=deciles[4],
         p90=deciles[8],

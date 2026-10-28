@@ -77,10 +77,15 @@ def decision_forecast(snapshot: Snapshot, day: date, cutoff: time) -> list[HourP
 
 
 def vintages(snapshot: Snapshot, day: date) -> dict[datetime, list[tuple[datetime, int]]]:
-    """Every forecast run with values for the delivery day: publish_time -> [(start, MW)]."""
-    targets = hourly_targets(day)
+    """Forecast runs the team could have seen for the delivery day: publish_time -> [(start, MW)].
+
+    Only runs published before the delivery day ends are included, and within each
+    run only true forecasts (publish_time <= target time) are kept.
+    """
+    _, day_end = _local_day_bounds(day)
     runs: dict[datetime, list[tuple[datetime, int]]] = {}
-    for target in targets:
+    for target in hourly_targets(day):
         for v in snapshot.forecasts.get(target, []):
-            runs.setdefault(v.publish_time, []).append((target, v.generation))
+            if v.publish_time < day_end and v.publish_time <= target:
+                runs.setdefault(v.publish_time, []).append((target, v.generation))
     return dict(sorted(runs.items()))

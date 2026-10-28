@@ -1,7 +1,7 @@
 from datetime import UTC, date, datetime, time
 
 from app.alignment import cutoff_datetime, day_actuals, decision_forecast, hourly_targets, vintages
-from app.snapshot import Snapshot
+from app.snapshot import ForecastValue, Snapshot
 from tests.conftest import utc
 
 DAY = date(2026, 1, 2)
@@ -58,3 +58,17 @@ def test_vintages_lists_every_run_in_publish_order(snapshot: Snapshot) -> None:
     assert list(runs) == [datetime(2025, 12, 31, 22, 30, tzinfo=UTC), utc(1, 7, 30), utc(1, 9, 30)]
     assert len(runs[utc(1, 7, 30)]) == 24
     assert len(runs[datetime(2025, 12, 31, 22, 30, tzinfo=UTC)]) == 22
+
+
+def test_vintages_keep_only_forecasts_visible_before_target_and_day_end(
+    snapshot: Snapshot,
+) -> None:
+    during_day, after_day = utc(2, 7, 30), utc(3, 2, 30)
+    for hour in range(24):
+        snapshot.forecasts[utc(2, hour)] += [
+            ForecastValue(during_day, 1300),
+            ForecastValue(after_day, 1400),
+        ]
+    runs = vintages(snapshot, DAY)
+    assert after_day not in runs
+    assert [start for start, _ in runs[during_day]] == [utc(2, h) for h in range(8, 24)]
