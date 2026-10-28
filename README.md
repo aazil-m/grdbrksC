@@ -8,7 +8,7 @@ A web app for a UK energy utility's day-ahead trading team. It shows **the wind 
 |---|---|
 | **Live app** | https://grdbrksc.vercel.app |
 | **API docs (interactive)** | https://grdbrksc.vercel.app/api/docs |
-| **Video walkthrough** | _link to be added_ |
+| **Video walkthrough** | https://youtu.be/o18s7GgxFrM |
 
 ---
 
