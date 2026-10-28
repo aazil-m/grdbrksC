@@ -106,6 +106,8 @@ def metrics_view(cutoff: CutoffParam) -> schemas.MetricsResponse:
         summary=schemas.Summary.model_validate(report.summary) if report.summary else None,
         total_hours=report.total_hours,
         missing_hours=report.missing_hours,
+        decision_horizon_min=report.decision_horizon_min,
+        decision_horizon_max=report.decision_horizon_max,
         histogram=[schemas.Bin.model_validate(b) for b in report.histogram],
         by_hour_of_day=[schemas.GroupStat.model_validate(g) for g in report.by_hour_of_day],
         by_day=[schemas.GroupStat.model_validate(g) for g in report.by_day],

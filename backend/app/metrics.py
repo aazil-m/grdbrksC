@@ -59,6 +59,9 @@ class Report:
     total_hours: int
     missing_hours: int
     """Hours with no forecast published before the cutoff; excluded from all metrics."""
+    decision_horizon_min: float | None
+    decision_horizon_max: float | None
+    """Range of lead times (hours) of the decision-time forecasts used."""
     histogram: list[Bin]
     by_hour_of_day: list[GroupStat]
     by_day: list[GroupStat]
@@ -146,10 +149,13 @@ def evaluate(snapshot: Snapshot, cutoff: time) -> Report:
         p for day in snapshot.delivery_days() for p in decision_forecast(snapshot, day, cutoff)
     ]
     usable = complete(points)
+    horizons = [p.horizon_hours for p in usable if p.horizon_hours is not None]
     return Report(
         summary=summarize(usable),
         total_hours=len(points),
         missing_hours=sum(1 for p in points if p.forecast is None),
+        decision_horizon_min=min(horizons, default=None),
+        decision_horizon_max=max(horizons, default=None),
         histogram=histogram([p.error for p in usable if p.error is not None]),
         by_hour_of_day=by_hour_of_day(usable),
         by_day=by_day(usable),

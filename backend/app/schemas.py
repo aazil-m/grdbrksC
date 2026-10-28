@@ -98,6 +98,8 @@ class MetricsResponse(ApiModel):
     summary: Summary | None
     total_hours: int
     missing_hours: int
+    decision_horizon_min: float | None
+    decision_horizon_max: float | None
     histogram: list[Bin]
     by_hour_of_day: list[GroupStat]
     by_day: list[GroupStat]
